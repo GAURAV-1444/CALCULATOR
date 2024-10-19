@@ -1,0 +1,85 @@
+import tkinter as tk
+
+# Function to handle button click
+def btn_click(item):
+    global expression
+    expression += str(item)
+    input_text.set(expression)
+
+# Function to evaluate the final expression
+def btn_equal():
+    global expression
+    try:
+        result = str(eval(expression))  # Use eval to evaluate the expression
+        input_text.set(result)
+        expression = result  # Reset expression to the result for further calculations
+    except Exception:
+        input_text.set("Error")
+        expression = ""
+
+# Function to clear the display (last entry)
+def btn_last_clear():
+    global expression
+    expression = expression[:-1]  # Remove the last character
+    input_text.set(expression)
+
+# Function to clear all (reset calculator)
+def btn_all_clear():
+    global expression
+    expression = ""
+    input_text.set("0")
+
+# Main window configuration
+root = tk.Tk()
+root.title("Calculator")
+root.geometry("350x400")
+root.config(bg="#F8F8F8")  # Set background color of the window
+expression = ""
+
+# StringVar to update the input display
+input_text = tk.StringVar()
+
+# Overall frame for the calculator
+calc_frame = tk.Frame(root, bg="#F0F0F0", bd=5, relief=tk.RAISED)
+calc_frame.pack(padx=10, pady=10)
+
+# Input frame for display
+input_frame = tk.Frame(calc_frame, bg="#F0F0F0")
+input_frame.pack(side=tk.TOP)
+
+# Display field
+input_field = tk.Entry(input_frame, font=('Arial', 18, 'bold'), textvariable=input_text, 
+                       width=30, bd=5, bg="#DFF4EC", fg="black", justify=tk.RIGHT)
+input_field.grid(row=0, column=0)
+input_field.pack(ipady=10)  # Internal padding for height
+
+# Buttons frame
+btns_frame = tk.Frame(calc_frame, bg="#F0F0F0")
+btns_frame.pack()
+
+# Button style definitions
+btn_bg = "#FFDDC1"   # Light peach for number buttons
+operator_bg = "#A7D3E0"  # Light blue for operator buttons
+equal_bg = "#B9E1B0"  # Light green for equal button
+clear_bg = "#FF6B6B"  # Red for clear buttons
+
+# Create buttons in a loop for better structure
+buttons = [
+    ('7', 1, 0), ('8', 1, 1), ('9', 1, 2), ('/', 1, 3, operator_bg),
+    ('4', 2, 0), ('5', 2, 1), ('6', 2, 2), ('*', 2, 3, operator_bg),
+    ('1', 3, 0), ('2', 3, 1), ('3', 3, 2), ('-', 3, 3, operator_bg),
+    ('0', 4, 0), ('.', 4, 1), ('C', 4, 2, clear_bg), ('+', 4, 3, operator_bg),
+    ('AC', 5, 0, clear_bg), ('=', 5, 1, equal_bg, 2), ('%', 5, 3, operator_bg)
+]
+
+for (text, row, column, bg_color, colspan) in [(b[0], b[1], b[2], b[3] if len(b) > 3 else btn_bg, b[4] if len(b) > 4 else 1) for b in buttons]:
+    tk.Button(btns_frame, text=text, font=('Arial', 18, 'bold'),
+              command=lambda item=text: btn_click(item) if item not in ['C', '=', 'AC'] else btn_equal() if item == '=' else btn_last_clear() if item == 'C' else btn_all_clear(),
+              height=2, width=8, bg=bg_color).grid(row=row, column=column, columnspan=colspan, padx=5, pady=5)
+
+btn_equal = tk.Button(btns_frame, text="=", font=('Arial', 18, 'bold'),
+                      command=btn_equal, height=2, width=17, bg=equal_bg)
+btn_equal.grid(row=5, column=1, columnspan=2, padx=5, pady=5)
+
+# Start the tkinter loop
+root.mainloop()
